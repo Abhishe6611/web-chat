@@ -4,31 +4,31 @@ import bcrypt from "bcryptjs";
 
 export const signup = async (req, res) => {
     try {
-        const {fullName, email, password} = req.body;
+        const { fullName, email, password } = req.body;
         console.log('New signup request received:', { fullName, email });
 
         // Input validation
-        if(!fullName || !email || !password) {
+        if (!fullName || !email || !password) {
             return res.status(400).json({
                 status: 'error',
                 message: "All fields are required"
             });
-        
-    }
+
+        }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if(!emailRegex.test(email)) {
-            return res.status(400).json({message: "Invalid email format"});
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: "Invalid email format" });
         }
 
-        if(password.length < 8){
-            return res.status(400).json({message: "Password must be at least 8 characters long"});
+        if (password.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters long" });
         }
 
         // Check if user exists
-        const existingUser = await User.findOne({email});
-        if(existingUser) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
             return res.status(400).json({
                 status: 'error',
                 message: "User already exists"
@@ -47,9 +47,9 @@ export const signup = async (req, res) => {
         });
 
         const savedUser = await newUser.save();
-        
+
         // Generate JWT token
-       const token = generateToken(savedUser._id, res);
+        const token = generateToken(savedUser._id, res);
 
         // Send both messages in response
         res.status(201).json({
