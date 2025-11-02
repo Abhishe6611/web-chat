@@ -2,9 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { connectDB } from "./lib/db.js";
+
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import { connect } from "http2";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +18,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json()); //req.body
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
@@ -26,6 +29,23 @@ if(process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
+  app.get('/test', (req, res) => {
+    res.json({ message: 'Server is working' });
+});
 }
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const startServer = async () => {
+  try {
+    //connectiong mongo db
+    await connectDB();
+
+    //starting server
+    app.listen(PORT, ()=> {
+      console.log("Server running on port", PORT);
+    });
+  } catch (error){
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+startServer();
