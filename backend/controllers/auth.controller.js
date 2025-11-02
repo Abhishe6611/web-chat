@@ -1,6 +1,9 @@
 import User from "../models/Users.js";
 import { generateToken } from "../lib/utils.js";
+import { sendWelcomeEmail } from "../emails/emailHandlers.js";
 import bcrypt from "bcryptjs";
+import "dotenv/config";
+import {ENV} from "../lib/env.js"
 
 export const signup = async (req, res) => {
     try {
@@ -13,11 +16,9 @@ export const signup = async (req, res) => {
                 status: 'error',
                 message: "All fields are required"
             });
-
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: "Invalid email format" });
         }
@@ -51,8 +52,18 @@ export const signup = async (req, res) => {
         // Generate JWT token
         const token = generateToken(savedUser._id, res);
 
-        // Send both messages in response
-        res.status(201).json({
+        // Send welcome email
+        try {
+            await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL);
+            console.log('Welcome email sent successfully');
+        } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+            // Continue execution - don't send another response
+        }
+ 
+        // Send single response with all data
+        return res.status(201).json({
+            status: 'success',
             message: "New user created",
             user: savedUser,
             token: token
@@ -60,7 +71,7 @@ export const signup = async (req, res) => {
 
     } catch (error) {
         console.error('Signup error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             status: 'error',
             message: "Internal server error",
             error: error.message
