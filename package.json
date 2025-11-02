@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Abhishe6611/chat-web#readme",
   "dependencies": {
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.19.2",
+    "resend": "^6.4.0"
   }
 }
