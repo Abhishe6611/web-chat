@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/Abhishe6611/chat-web/issues"
   },
-  "homepage": "https://github.com/Abhishe6611/chat-web#readme"
+  "homepage": "https://github.com/Abhishe6611/chat-web#readme",
+  "dependencies": {
+    "mongoose": "^8.19.2"
+  }
 }
